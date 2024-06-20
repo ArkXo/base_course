@@ -9,5 +9,7 @@ print(v)
 
 T = 200
 E = 300
-N = (2 * const.ht * (const.e**( (-E) / (const.k * T))) * (E ** ( T/2 ))) / (np.sqrt(const.pi) * (const.k * T)**(3/2))
+from lab_3_task1 import k
+from lab_3_task1 import ht
+N = (2 * ht * (const.e**( (-E) / (k * T))) * (E ** ( T/2 ))) / (np.sqrt(const.pi) * (k * T)**(3/2))
 print(N)
