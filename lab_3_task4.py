@@ -13,4 +13,3 @@ for i in range (0, N ):
             trigonometry_array[i, k] = 0
     
 print(trigonometry_array)
-# ds
