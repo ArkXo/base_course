@@ -1,11 +1,12 @@
 import numpy as np
 
-mas = []
-while len(mas) <= 10:
-    a = input()
-    if a == " ":
-        break
-    else:
-        mas.append(int(a))
-
+mas = np.zeros()
+# while len(mas) <= 10:
+#     a = input()
+#     if a == " ":
+#         break
+#     else:
+#         np.append(mas, [int(a)])
+# a = input()
+np.append(mas, [int(input())])
 print(mas)
