@@ -2,8 +2,8 @@ import lab_3_task1 as const
 import numpy as np
 
 h = 100
-a = const.pi / 3
-b = const.pi / 6
+a = 45 / 180 * np.pi
+b = 35 / 180 * np.pi
 v = np.sqrt((const.g * h * np.tan(b)**2)/(2 * np.cos(a)**2 * (1 - np.tan(b) * np.tan(a))))
 print(v)
 
