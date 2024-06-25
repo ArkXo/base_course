@@ -6,5 +6,7 @@ def average(array):
         av += array[i]
     av = av / 2
     return av
-a = np.array(list())
-# print(average(np.array([list(input()), int])))
+a = [1, 2, 3]
+print(np.array(a))
+# print(np.array(list(input())))
+print(average(a))
