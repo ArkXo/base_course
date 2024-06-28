@@ -1,11 +1,10 @@
 import numpy as np
 
-def average(array):
-    av = 0
+def multiply(array):
+    mul = 1
     for i in range(0, len(array)):
-        av += array[i]
-    av = av / 2
-    return av
+        mul = mul * array[i]
+    return mul
 
 array = np.array([])
 while 1:
@@ -15,4 +14,4 @@ while 1:
     a = int(a)
     array = np.append(array, [a])
 
-print(average(array))
+print(multiply(array))
