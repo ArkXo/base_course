@@ -3,7 +3,7 @@ import numpy as np
 def multiply(array):
     mul = 1
     for i in range(0, len(array)):
-        mul = mul * array[i]
+        mul *= array[i]
     return mul
 
 array = np.array([])
