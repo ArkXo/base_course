@@ -1,35 +1,28 @@
-import numpy as np
-import matplotlib.pyplot as plt
 from matplotlib.animation import FuncAnimation
+import matplotlib.pyplot as plt
+import numpy as np
 
-def circle(lim, a):
-    t = np.arange(-lim, lim, 0.1)
-    phi = np.arange(0, 2*np.pi, 0.1)
-    r = a * t
-    x = r*np.cos(phi)
-    y = r*np.sin(phi)
+def circle_move(R):
+    alpha = np.arange(0, 2.1*np.pi, 0.1)
+    x = R*np.cos(alpha)
+    y = R*np.sin(alpha)
     return x, y
 
-fig, ax = plt.subplots() # Создание пространства и подпространства
 
-anim_object, = plt.plot([], [], '-', lw=2) # Объект анимации
+def animate(R):
+    ball.set_data(circle_move(R=R))
 
-xdata, ydata = [], [] # Координаты объекта анимации
 
-ax.set_xlim(0, 2*np.pi) # Пределы изменения переменной Х
-ax.set_ylim(-1, 1) # Пределы изменения переменной У
+if __name__ == '__main__':
 
-# Функция подстановки координат в объект анимации
-def update(frame):
-    xdata.append(frame) # Рассщет координаты Х
-    ydata.append(np.sin(frame)) # Рассщет координаты У
-    anim_object.set_data(xdata, ydata) # Передача координат
-    return anim_object,
+    fig, ax = plt.subplots()
+    ball, = plt.plot([], [], '-', color='r', label='Ball')
 
-ani = FuncAnimation(fig, # Стандартный вызов пространства
-                    update, # Вызов функции подстановки координат
-                    frames=np.arange(0, 2*np.pi, 0.1),
-                    interval=100 # Интервал между кадрами,
-                    )            # по умолчанию 200 милисекунд
+    edge = 3
+    plt.axis('equal')
+    ax.set_xlim(-edge, edge)
+    ax.set_ylim(-edge, edge)
+    
+    ani = FuncAnimation(fig, animate, frames=np.arange(0, 3, 0.05), interval=30)
 
-ani.save('animation_1.gif')
+    ani.save('animation_task2.gif')

@@ -8,6 +8,7 @@ def cycloid(R):
     y = R * (1 - np.cos(t)**3)
 
     plt.plot(x, y, ls='-', lw=3)
+    plt.axis('equal')
     plt.savefig('fig_cycloid.png')
 
 cycloid(int(input("Введите значение радиуса: ")))
