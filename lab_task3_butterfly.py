@@ -2,15 +2,15 @@ from matplotlib.animation import FuncAnimation
 import matplotlib.pyplot as plt
 import numpy as np
 
-def bttrfl(i):
-    t = np.arange(i- (2*np.pi), i, 0.01)
+def bttrfl(w):
+    t = np.arange(0, 12*np.pi, 0.01)
     x = np.sin(t) * ((np.e**np.cos(t)) - (2*np.cos(4*t)) + (np.sin(t/12)**5))
     y = np.cos(t) * ((np.e**np.cos(t)) - (2*np.cos(4*t)) + (np.sin(t/12)**5))
     return x, y
 
 
 def animate(i):
-    butterfly.set_data(bttrfl(i=i))
+    butterfly.set_data(bttrfl(w=i))
 
 
 
@@ -23,6 +23,6 @@ ax.set_xlim(-edge, edge)
 ax.set_ylim(-edge, edge)
     
 
-ani = FuncAnimation(fig, animate, frames=np.arange(0, 12*np.pi, 0.1), interval=100)
+ani = FuncAnimation(fig, animate, frames=np.arange(0, 12*np.pi, 0.5), interval=100)
 
 ani.save("animation_butterfly.gif")
