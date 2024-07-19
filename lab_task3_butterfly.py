@@ -23,6 +23,6 @@ ax.set_xlim(-edge, edge)
 ax.set_ylim(-edge, edge)
     
 
-ani = FuncAnimation(fig, animate, frames=np.arange(0, 12.1*np.pi, np.pi/2), interval=200)
+ani = FuncAnimation(fig, animate, frames=np.arange(0, 12*np.pi, 0.1), interval=100)
 
 ani.save("animation_butterfly.gif")
