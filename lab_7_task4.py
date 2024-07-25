@@ -24,6 +24,6 @@ fig, ax = plt.subplots()
 fractal, = plt.plot([], [], '-', color='r', label='Butterfly', lw = 1)
 
 
-ani = FuncAnimation(fig, animate, frames=np.arange(0, int(input()), 1), interval=100)
+ani = FuncAnimation(fig, animate, frames=np.arange(0, int(input("Введите количество точек: ")), 1), interval=100)
 
 ani.save("animation_task4.gif")
