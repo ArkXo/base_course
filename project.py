@@ -75,7 +75,7 @@ def move_spaceship(time):
 
     for j in np.arange(0, 3*np.pi, 0.0001):
         fxy = j - e * np.sin(j) - M
-        if fxy >=0.001:
+        if fxy >=0.01:
             E = j
             break
 
@@ -98,7 +98,7 @@ def move_spaceship_line(time):
             E = j
             break
 
-    E = np.arange(0,E,0.01)
+    E = np.arange(0, E, 0.01)
     x = a * np.cos(E) - (a-1)
     y = b * np.sin(E)
 
