@@ -11,7 +11,7 @@ print("Закон изменения инвестиций: v = 0.08 * n,\nгде
 print()
 
 def investment_function(n, t):
-    dndt = -k * n
+    dndt = -(k * n)
     return dndt
 
 n_t = odeint(investment_function, n_0, t)
