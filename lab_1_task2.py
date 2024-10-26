@@ -7,22 +7,22 @@ k = 0.08
 t_0 = 4*365
 t = np.arange(0, t_0, 1)
 
-print("Закон изменения инвестиций: v = 0.08 * n,\nгде v - скорость, n - кол-во бактерий в моменте, k - коэфицент пропорциональности.")
+print("Закон изменения инвестиций: v = 0.08 * n,\nгде v - скорость, n - инвестируемые в данный момент времени средства, k - коэфицент пропорциональности.")
 print()
 
-def bacterium_function(n, t):
+def investment_function(n, t):
     dndt = -k * n
     return dndt
 
-n_t = odeint(bacterium_function, n_0, t)
+n_t = odeint(investment_function, n_0, t)
 
-print(f"Время, спустя которое бактерий станет в  раз больше", n_t[-1])
+print(n_t)
 
 
-plt.plot(t, n_t[:,0], label="Размножение бактерий")
-plt.xlabel("Время увеличения, секунды")
-plt.ylabel("Функция увеличения")
-plt.title("Закон увеличения")
+plt.plot(t, n_t[:,0], label="Инвестиции")
+plt.xlabel("Время уменьшения, секунды")
+plt.ylabel("Функция уменьшения")
+plt.title("Закон уменьшения")
 plt.legend()
 
 plt.savefig("fig_2.png")

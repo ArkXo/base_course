@@ -27,4 +27,4 @@ plt.ylabel("Функция увеличения")
 plt.title("Закон увеличения")
 plt.legend()
 
-plt.savefig("task1.png")
+plt.savefig("lab_task1.png")
