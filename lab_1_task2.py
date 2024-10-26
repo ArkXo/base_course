@@ -25,4 +25,4 @@ plt.ylabel("Функция уменьшения")
 plt.title("Закон уменьшения")
 plt.legend()
 
-plt.savefig("fig_2.png")
+plt.savefig("lab_task2.png")
