@@ -4,8 +4,8 @@ import matplotlib.pyplot as plt
 
 n_0 = 1000
 k = 0.08
-t_0 = 1.5*365
-t = np.arange(0, t_0, 1)
+t = np.arange(0, 100, 1)
+summa = 0
 
 print("Закон изменения инвестиций: v = 0.08 * n,\nгде v - скорость, n - инвестируемые в данный момент времени средства, k - коэфицент пропорциональности.")
 print()
@@ -14,9 +14,13 @@ def investment_function(n, t):
     dndt = -(k * n)
     return dndt
 
-n_t = odeint(investment_function, n_0, t)
+for i in range(0, 5):
+    summa += n_0 * (1-k)**i
 
-print(n_t)
+print("Объём инвестиций за 4 года:", round(summa))
+
+
+n_t = odeint(investment_function, n_0, t)
 
 plt.plot(t, n_t[:,0], label="Инвестиции")
 plt.xlabel("Время уменьшения, дни")
