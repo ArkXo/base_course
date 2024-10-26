@@ -13,8 +13,6 @@ def boost_function(v, t):
     return dvdt
 
 v_t = odeint(boost_function, v_0, t)
-print(v_t)
-
 
 plt.plot(t, v_t[:,0], label="скорость")
 plt.xlabel("Время, секунды")
