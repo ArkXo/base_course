@@ -4,14 +4,14 @@ import matplotlib.pyplot as plt
 
 n_0 = 1000
 k = 0.08
-t = np.arange(0, 100, 1)
+t = np.arange(0, 10, 0.01)
 summa = 0
 
 print("Закон изменения инвестиций: v = 0.08 * n,\nгде v - скорость, n - инвестируемые в данный момент времени средства, k - коэфицент пропорциональности.")
 print()
 
 def investment_function(n, t):
-    dndt = -(k * n)
+    dndt = -(k * n * t)
     return dndt
 
 for i in range(0, 5):
