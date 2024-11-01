@@ -29,6 +29,6 @@ plt.plot(x, sol[:, 0], "b", label="y(t)")
 plt.plot(x, sol[:, 1], "g", label="omaga(t)")
 
 
-plt.legend
+plt.legend()
 plt.savefig("fig_2.png")
 

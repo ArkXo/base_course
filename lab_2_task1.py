@@ -21,6 +21,6 @@ sol = odeint(diff_func, z0, x)
 
 plt.plot(x, sol[:, 0], "b", label="y(t)")
 plt.plot(x, sol[:, 1], "g", label="z(t)")
-plt.legend
+plt.legend()
 plt.savefig("task1.png")
 

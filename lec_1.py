@@ -31,6 +31,6 @@ sol = odeint(diff_func, z0, t)
 plt.plot(t, sol[:, 0], "b", label="theta(t)")
 
 
-plt.legend
+plt.legend()
 plt.savefig("fig_1.png")
 
