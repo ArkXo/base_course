@@ -4,30 +4,15 @@ import matplotlib.pyplot as plt
 
 S_0 = 0.16
 E_0 = 1360
-k = 0.00005
-S =[]
+k = 340 * 10**(-8)
 
-t = np.arange(0, 24, 0.1)
+t = np.arange(0, 24, 0.01)
 
-for i in np.arange(0, 24, 0.1):
-    if i >= 6 and i <= 18:
-        alpha = abs(12-i)*15 * np.pi/180
-        dSdt = k * E_0*np.cos(alpha)*np.sqrt((S_0**3)/np.pi)
-    else:
-        dSdt = 0
-    S_0 += dSdt
-    S.append(S_0)
-    if i == 12:
-        k = 0.25/(S_0)*k
-        print(k)
-
-S_0 = 0.16
 
 def func_victoria_rega(S, t):
     print(t)
     if t >= 6 and t <= 18:
-        alpha = abs(12-t)*15 * np.pi/180
-        dsdt = k * E_0*np.cos(alpha)*np.sqrt((S**3)/np.pi)
+        dsdt = k * E_0*np.cos((12-t)*np.pi/12)*np.sqrt((S**3)/np.pi)
     else:
         dsdt = 0
     return dsdt
