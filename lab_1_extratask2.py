@@ -14,8 +14,6 @@ def func_victoria_rega(S, t):
         dsdt = k * E_0*np.cos((12-t)*np.pi/12)*np.sqrt((S/10**4)**3/np.pi)*10**4
     else:
         dsdt = 0
-    if t == round(12):
-        print(S)
     return dsdt
 
 S_t = odeint(func_victoria_rega, S_0, t)
