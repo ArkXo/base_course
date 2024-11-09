@@ -2,7 +2,7 @@ import numpy as np
 from scipy.integrate import odeint
 import matplotlib.pyplot as plt
 
-x = np.arange(0, 1, 0.01)
+x = np.arange(-0.9, 0.9, 0.0001)
 
 def diff_func(z, x):
     y, omega = z
