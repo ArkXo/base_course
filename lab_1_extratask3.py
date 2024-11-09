@@ -32,7 +32,6 @@ E_0 = 0
 z_0 = phi_0, E_0
 
 E_t = odeint(enrgy_func, z_0, t)
-print(E_t)
 
 plt.plot(t/3600, E_t[:,1], label="Энергия")
 plt.xlabel("Время, часы")
@@ -41,3 +40,7 @@ plt.title("Закон изменения энергии")
 plt.legend()
 
 plt.savefig("lab_extratask3.png")
+
+E_sum = round(E_t[-1,-1] / 10**25, 2) * 10**25
+
+print("Энергия, которую планета получила за лдин оборот равна:", E_sum, "Дж")
