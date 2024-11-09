@@ -23,7 +23,7 @@ def enrgy_func(z, t):
 
     dphi_dt = np.sqrt(G*M_son*p) / r**2
 
-    dE_dt = (L_son * R**2)/(2*r**2)
+    dE_dt = (L_son * R**2)/(4*r**2)
 
     return dphi_dt, dE_dt
 
