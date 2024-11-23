@@ -2,31 +2,33 @@ import numpy as np
 from scipy.integrate import odeint
 import matplotlib.pyplot as plt
 from matplotlib.animation import FuncAnimation
-	
-# Определяем переменную величину
+
 frames = 200
-t = np.linspace(0, 5, frames)
-	
-# Определяем функцию для системы диф. уравнений
+t = np.linspace(0, 2, frames)
+
 def move_func(z, t):
     x, vx, y, vy = z
     
+    ax = k * vx
+    ay = k * vy
+
     dx_dt = vx
-    dvx_dt = 0
+    dvx_dt = - gx - ax
     dy_dt = vy
-    dvy_dt = - g
+    dvy_dt = - gy - ay
     
     return dx_dt, dvx_dt, dy_dt, dvy_dt
 
-# Определяем начальные значения и параметры
-g = 9.8
-v = 15
-alpha = 80 * np.pi / 180
+gx = 10
+gy = 9.8
+v0 = 15
+alpha = 30 * np.pi / 180
+k = 0.2
 
 x0 = 0
-vx0 = v * np.cos(alpha)
+vx0 = v0 * np.cos(alpha)
 y0 = 0
-vy0 = v * np.sin(alpha)
+vy0 = v0 * np.sin(alpha)
 
 z0 = x0, vx0, y0, vy0
 
@@ -45,9 +47,8 @@ fig, ax = plt.subplots()
 ball, = plt.plot([], [], 'o', color='r')
 ball_line, = plt.plot([], [], '-', color='r')
 
-edge = 15
-ax.set_xlim(0, edge)
-ax.set_ylim(0, edge)
+ax.set_xlim(0, 10)
+ax.set_ylim(0, 3)
 
 ani = FuncAnimation(fig, animate, frames=frames, interval=30)
-ani.save('less_1.gif')
+ani.save('lab_3_task2.gif')
