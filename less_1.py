@@ -3,11 +3,10 @@ from scipy.integrate import odeint
 import matplotlib.pyplot as plt
 from matplotlib.animation import FuncAnimation
 
-# Определяем переменную величину
 frames = 200
 t = np.linspace(0, 5, frames)
+print(len(t))
 
-# Определяем функцию для системы диф. уравнений
 def move_func(z, t):
     x, vx, y, vy = z
     
@@ -18,7 +17,7 @@ def move_func(z, t):
     
     return dx_dt, dvx_dt, dy_dt, dvy_dt
 
-# Определяем начальные значения и параметры
+
 g = 9.8
 v = 15
 alpha = 80 * np.pi / 180
@@ -41,23 +40,20 @@ def solve_func(i, key):
         x = sol[:i, 0]
         y = sol[:i, 2]
     return x, y
-  
-# Строим решение в виде графика и анимируем
-fig, ax = plt.subplots()
-
-ball, = plt.plot([], [], 'o', color='r')
-ball_line, = plt.plot([], [], '-', color='r')
-
 
 def animate(i):
+    print(i)
     ball.set_data(solve_func(i, 'point'))
-    ball_line.set_data(solve_func(i, 'line'))
+    # ball_line.set_data(solve_func(i, 'line'))
 
-
-ani = FuncAnimation(fig, animate, frames=frames, interval=30)
+fig, ax = plt.subplots()
+ball, = plt.plot([], [], 'o', color='r')
+# ball_line, = plt.plot([], [], '-', color='r')
 
 edge = 15
 ax.set_xlim(0, edge)
 ax.set_ylim(0, edge)
+
+ani = FuncAnimation(fig, animate, frames=200, interval=30)
 
 ani.save('animation.gif')
