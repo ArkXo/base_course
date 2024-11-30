@@ -9,7 +9,7 @@ def move_func(z, t):
     y, v = z
 
     dy_dt = v
-    dv_dt = g - k*y/m
+    dv_dt = g - k*y/m - 0.8*v
     return dy_dt, dv_dt
 
 m = 0.5
@@ -43,4 +43,4 @@ ax.set_xlim(-edge, edge)
 ax.set_ylim(-edge, edge)
 
 ani = FuncAnimation(fig, animate, frames=300, interval=50)
-ani.save('extratasks givs/lab_3_extratask2_var_a.gif')
+ani.save('extratasks givs/lab_3_extratask2_var_b.gif')
