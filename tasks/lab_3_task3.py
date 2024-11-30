@@ -24,19 +24,23 @@ z0 = A0, X0, Y0
 sol = odeint(decay_func, z0, t)
 X = sol[:, 1]
 Y = sol[:, 2]
+A = sol[:, 0]
 
 def animate(i):
-    X_el.set_data([X[:i]], [t[:i]])
+    X_el.set_data([t[:i]], [X[:i]])
 
-    Y_el.set_data([Y[:i]], [t[:i]])
+    Y_el.set_data([t[:i]], [Y[:i]])
+
+    A_el.set_data([t[:i]], [A[:i]])
 
 fig, ax = plt.subplots()
 
 X_el, = plt.plot([], [], '-', color='r')
 Y_el, = plt.plot([], [], '-', color='g')
+A_el, = plt.plot([], [], '-', color='b')
 
-ax.set_xlim(0, 500)
-ax.set_ylim(0, 200)
+ax.set_xlim(0, 200)
+ax.set_ylim(0, 500)
 
 ani = FuncAnimation(fig, animate, frames=200, interval=30)
 ani.save('lab_3_task3.gif')

@@ -3,20 +3,24 @@ from scipy.integrate import odeint
 import matplotlib.pyplot as plt
 from matplotlib.animation import FuncAnimation
 
-t = np.arange(0, 200, 0.5)
+t = np.arange(0, 2000, 0.05)
 
 def move_func(z, t):
     y, v = z
 
-    dy_dt = -v
-    dv_dt = g + k*y/m
+    dy_dt = v
+    dv_dt = -g - k*y/m
     return dy_dt, dv_dt
 
-k = 500
-m = 0.8
-v0 = 5
+m = 0.5
+
+delta_L = 0.08
+F_0 = 1
+k = F_0 / delta_L
+
+v0 = 0.5
 g = 9.8
-y0 = 0
+y0 = - delta_L
 
 z0 = y0, v0
 
@@ -33,11 +37,11 @@ fig, ax = plt.subplots()
 move_line, = plt.plot([], [], '-', color='g')
 move, = plt.plot([], [], 'o', color='r')
 roof, = plt.plot(np.linspace(-0.4, 0.4, 20), np.full(20, 0.4), '-', color='0')
+roof_1, = plt.plot(np.linspace(-0.4, 0.4, 20), np.full(20, 0), '-', color='0')
 
-edge = 0.5
+edge = 1
 ax.set_xlim(-edge, edge)
 ax.set_ylim(-edge, edge)
 
-ani = FuncAnimation(fig, animate, frames=300, interval=30)
-ani.save('lab_3_task4.gif')
-
+ani = FuncAnimation(fig, animate, frames=300, interval=50)
+ani.save('extratasks givs/lab_3_extratask2.gif')
