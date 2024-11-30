@@ -27,9 +27,9 @@ B = sol[:, 1]
 C = sol[:, 2]
 
 def animate(i):
-    A_sum.set_data([A[:i]], [t[:i]])
-    B_sum.set_data([B[:i]], [t[:i]])
-    C_sum.set_data([C[:i]], [t[:i]])
+    A_sum.set_data([t[:i]], [A[:i]])
+    B_sum.set_data([t[:i]], [B[:i]])
+    C_sum.set_data([t[:i]], [C[:i]])
 
 fig, ax = plt.subplots()
 
@@ -37,8 +37,8 @@ A_sum, = plt.plot([], [], '-', color='r')
 B_sum, = plt.plot([], [], '-', color='g')
 C_sum, = plt.plot([], [], '-', color='b')
 
-ax.set_xlim(0, 500)
-ax.set_ylim(0, 200)
+ax.set_xlim(0, 200)
+ax.set_ylim(0, 500)
 
 ani = FuncAnimation(fig, animate, frames=300, interval=30)
-ani.save('lab_3_extratask1.gif')
+ani.save('extratasks givs/lab_3_extratask1.gif')
