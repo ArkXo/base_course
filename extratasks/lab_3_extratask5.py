@@ -3,7 +3,7 @@ from scipy.integrate import odeint
 import matplotlib.pyplot as plt
 from matplotlib.animation import FuncAnimation
 
-t = np.arange(0, 5, 0.1)
+t = np.arange(0, 50, 0.4)
 
 def decay_func(z, t):
     T_1, T_2 = z
@@ -14,10 +14,10 @@ def decay_func(z, t):
     return dT1_dt, dT2_dt
 
 T_g = 0
-alpha_1 = 0.4
+alpha_1 = 0.05
 T_e = 20
-alpha_2 = 0.2
-alpha_3 = 0.1
+alpha_2 = 0.02
+alpha_3 = 0.01
 
 T_10 = 10
 T_20 = 20
@@ -39,8 +39,8 @@ T_1_func, = plt.plot([], [], '-', color='r')
 T_2_func, = plt.plot([], [], '-', color='g')
 
 edge = 40
-ax.set_xlim(0, 5)
-ax.set_ylim(0, 25)
+ax.set_xlim(0, 40)
+ax.set_ylim(0, 50)
 
-ani = FuncAnimation(fig, animate, frames=200, interval=30)
+ani = FuncAnimation(fig, animate, frames=100, interval=30)
 ani.save('extratasks givs/lab_3_extratask5.gif')
