@@ -2,9 +2,9 @@ import numpy as np
 from scipy.integrate import odeint
 import matplotlib.pyplot as plt
 from matplotlib.animation import FuncAnimation
-
+	
 frames = 500
-seconds_in_year = 365*24**60*60
+seconds_in_year = 365 * 24 * 60 * 60
 years = 1
 t = np.linspace(0, years*seconds_in_year, frames)
 
@@ -29,19 +29,19 @@ vy0 = 30000
 s0 = x0, vx0, y0, vy0
 
 sol = odeint(move_func, s0, t)
-x = sol[:,0]
-y = sol[:,2]
+x = sol[:, 0]
+y = sol[:, 2]
 
 def animate(i):
     ball.set_data([x[i]], [y[i]])
+
     ball_line.set_data([x[:i]], [y[:i]])
 
 fig, ax = plt.subplots()
 
-ball, = plt.plot([], [], "o", color="b")
-ball_line, = plt.plot([], [], "-", color="b")
-son, = plt.plot([0], [0], "o", color="y", ms=20)
-
+ball, = plt.plot([], [], 'o', color='r')
+ball_line, = plt.plot([], [], '-', color='r')
+plt.plot([0], [0], 'o', color='y', ms=20)
 
 plt.axis("equal")
 edge = 2 * x0
