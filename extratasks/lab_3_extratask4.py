@@ -36,13 +36,14 @@ def animate(i):
         x_func.set_data(np.linspace(0, x[i], 20), [np.full(20, l)])
         y_func.set_data([np.full(20, 0)], np.linspace(y[i], l, 20))
     else:
+        x_func.set_data([], [])
         y_func.set_data([np.full(20, 0)], np.linspace(y[i], y[i] + L, 20))
 
 fig, ax = plt.subplots()
 
 x_func, = plt.plot([], [], '-', color='r')
 y_func, = plt.plot([], [], '-', color='r')
-table, = plt.plot(np.full(20, np.linspace(0, L, 20)), np.full(20, np.linspace(0, l, 20)), '-', color='0')
+# table, = plt.plot(np.full(20, np.linspace(0, L, 20)), np.full(20, np.linspace(0, l, 20)), '-', color='0')
 
 edge = 5
 ax.set_xlim(-edge, edge)
