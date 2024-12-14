@@ -21,7 +21,6 @@ s0 = ([0.387*ae, 0, 0, v_earth/np.sqrt(0.387)],
 
 def move_func(s, t):
     x, v_x, y, v_y = s
- 
     dx_dt = v_x
     dvx_dt = - G * M * x / (x**2 + y**2)**1.5
     dy_dt = v_y
@@ -39,12 +38,14 @@ def move_func(s, t):
 # plt.plot([0], [0], 'o', color='y', ms=20)
 
 # for j in s0:
+sol0 = []
+for i in s0:
+    sol = odeint(move_func, i, t)
+    sol0 = np.append(sol0, [[sol]])
 
-sol = odeint(move_func, s0, t)
-
-x = sol[:, 0] / ae
-y = sol[:, 2] / ae
-print(x)
+# x = sol[:, 0] / ae
+# y = sol[:, 2] / ae
+print(sol0)
 
     # def animate(i):
     #     ball.set_data([x[i]], [y[i]])
