@@ -91,4 +91,4 @@ ball_pha_line, = plt.plot([], [], '-', color='0')
 ball_pha, = plt.plot([], [], 'o', color='tab:gray')
 
 ani = FuncAnimation(fig, animate, frames=frames, interval=30)
-ani.save("gifs/task1.gif")
+ani.save("task1.gif")
