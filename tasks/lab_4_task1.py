@@ -12,11 +12,11 @@ t = np.linspace(0, years*seconds_in_year, frames)
 G = 6.67 * 10**(-11)
 M = 1.98 * 10**(30)
 ae = 149 * 10**9
-v_earth = 30000
+v_earth = 29800
  
-s0 = ([0.387*ae, 0, 0, v_earth/np.sqrt(0.387)],
-      [0.723*ae, 0, 0, v_earth/np.sqrt(0.723)],
-      [1*ae, 0, 0, v_earth],
+s0_merc = 0.387*ae, 0, 0, v_earth/np.sqrt(0.387)
+s0_ven = 0.723*ae, 0, 0, v_earth/np.sqrt(0.723)
+s0_earth = 1*ae, 0, 0, v_earth
       [1.52*ae, 0, 0, v_earth/np.sqrt(1.52)])
 
 def move_func(s, t):
@@ -28,31 +28,29 @@ def move_func(s, t):
 
     return dx_dt, dvx_dt, dy_dt, dvy_dt
 
-# anim = []
-# fig, ax = plt.subplots()
-# plt.axis("equal")
-# edge = 2
-# ax.set_xlim(-edge, edge)
-# ax.set_ylim(-edge, edge)
+sol = odeint(move_func, s0, t)
 
-# plt.plot([0], [0], 'o', color='y', ms=20)
+x = sol[:, 0] / ae
+y = sol[:, 2] / ae
 
-# for j in s0:
-sol0 = []
-for i in s0:
-    sol = odeint(move_func, i, t)
-    sol0 = np.append(sol0, [[sol]])
 
-# x = sol[:, 0] / ae
-# y = sol[:, 2] / ae
-print(sol0)
+def animate(i):
+    ball.set_data([x[i]], [y[i]])
 
-    # def animate(i):
-    #     ball.set_data([x[i]], [y[i]])
+    ball_line.set_data([x[:i]], [y[:i]])
 
-    #     ball_line.set_data([x[:i]], [y[:i]])
+fig, ax = plt.subplots()
+plt.axis("equal")
+edge = 2
+ax.set_xlim(-edge, edge)
+ax.set_ylim(-edge, edge)
 
-    # ball, = plt.plot([], [], 'o', color='b')
-    # ball_line, = plt.plot([], [], '-', color='b')
-    # ani = FuncAnimation(fig, animate, frames=frames, interval=30)
-    # ani.save("gifs/task1.gif")
+plt.plot([0], [0], 'o', color='y', ms=20)
+
+ball, = plt.plot([], [], 'o', color='b')
+ball_line, = plt.plot([], [], '-', color='b')
+
+
+
+ani = FuncAnimation(fig, animate, frames=frames, interval=30)
+ani.save("gifs/task1.gif")
