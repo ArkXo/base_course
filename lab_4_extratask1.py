@@ -14,10 +14,10 @@ def func(r, N, v, x_0, y_0):
 
     return X, Y
 
-sol = func(5, 10, 2, 3, 4)
+sol = func(5, 20, 2, 3, 4)
 t = sol[0]
 s = sol[1]
-print(t)
 
-plt.plot(t, s, label="Площадь")
+plt.plot(t, s, 'o')
+plt.axis("equal")
 plt.savefig("lab_extratask1.png")
