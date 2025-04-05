@@ -14,7 +14,7 @@ class Paint(Frame):
         self.color = "black"
         self.brush_size = 1
         self.width = 900
-        self.height = 600
+        self.height = 600bbb
         self.setUI()
 
     def draw(self, event):
