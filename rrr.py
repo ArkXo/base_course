@@ -213,3 +213,4 @@ button.place(x=98, y=500)
 
 app = Paint(frame1)  # Передаем размеры окна
 root.mainloop()
+
