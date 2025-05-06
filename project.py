@@ -6,7 +6,8 @@ from matplotlib.backends.backend_tkagg import FigureCanvasTkAgg  # Для вст
 
 from const import *
 from class_paint import Paint
-from center_mass import calculate_center_of_mass
+from center_mass import calc_center_mass
+from moment_inert import calc_moment_inert
 
 x = []
 y = []
@@ -42,8 +43,8 @@ def btn_func():
     ax.plot(x_arr, y_arr, label="Original")
 
     # Аппроксимация нарисованного объекта
-    step = 1500
-    mytck, myu = sc.splprep([x_arr, y_arr], s=0)
+    step = 1000
+    mytck, myu = sc.splprep([x_arr, y_arr])
     xnew, ynew = sc.splev(np.linspace(0, 1, step), mytck)
     ax.plot(xnew, ynew, 'red', label="Approximation")
 
@@ -114,36 +115,38 @@ def btn_func():
         if beta >= 0:
             if beta >= alpha:
                 if beta - alpha < np.pi/2:
-                    gamma.append(beta - alpha)
+                    gamma.append(float(beta - alpha))
                     ax.plot([x_h, x_h+50*np.cos(alpha)], [y_h, y_h+50*np.sin(alpha)], 'yellow')
             else:
                 if alpha - beta < np.pi/2:
-                    gamma.append(alpha - beta)
+                    gamma.append(float(alpha - beta))
                     ax.plot([x_h, x_h+50*np.cos(alpha)], [y_h, y_h+50*np.sin(alpha)], 'yellow')
         else:
             if abs(beta) >= np.pi - alpha:
                 if 2*np.pi - abs(beta) - alpha < np.pi/2:
-                    gamma.append(2*np.pi - abs(beta) - alpha)
+                    gamma.append(float(2*np.pi - abs(beta) - alpha))
                     ax.plot([x_h, x_h+50*np.cos(alpha)], [y_h, y_h+50*np.sin(alpha)], 'yellow')
             else:
                 if alpha + abs(beta) < np.pi/2:
-                    gamma.append(alpha + abs(beta))
+                    gamma.append(float(alpha + abs(beta)))
                     ax.plot([x_h, x_h+50*np.cos(alpha)], [y_h, y_h+50*np.sin(alpha)], 'yellow')
 
     # Настройка легенды и заголовка
     ax.set_title("Graph with Normals")
 
     # Вычисляем центр масс
-    Cx, Cy = calculate_center_of_mass(x, y)
+    Cx, Cy = calc_center_mass(x, y)
     ax.scatter(Cx, Cy, color='blue', zorder=5)
     
+    # Расчёт момента инерции
+    moment_of_inertia = round(calc_moment_inert(xnew - Cx, ynew - Cy))
+    print(f"Момент инерции: {moment_of_inertia}")
 
     # Встраиваем график в Tkinter
     canvas = FigureCanvasTkAgg(fig, master=frame1)
     canvas.draw()
     canvas.get_tk_widget().pack(fill=BOTH, expand=True)
     energy_calc()
-    return temperature
 
 
 def energy_calc():
@@ -156,8 +159,8 @@ def energy_calc():
     lambda_array = np.random.normal(mu, sigma, 1000)
     impulse_array = []
     for i in range(0, len(gamma)):
-        impulse_array.append(h / lambda_array[i] * np.cos(gamma[i]))
-        print(gamma)
+        impulse_array.append(float(h / lambda_array[i] * np.cos(gamma[i])))
+    print(gamma)
     print(impulse_array)
 
 # Размеры окна
