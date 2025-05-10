@@ -1,4 +1,4 @@
-def calculate_center_of_mass(x, y):
+def calc_center_mass(x, y):
     """
     Вычисляет центр масс многоугольника по координатам его вершин.
     :param x: Список x-координат вершин.
