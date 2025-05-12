@@ -14,6 +14,7 @@ def str_str(t):
 
 def animate(i):
     star.set_data(str_str(t=i))
+    print(i)
 
 
 
