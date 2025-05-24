@@ -1,8 +1,11 @@
 from tkinter import *
 import matplotlib.pyplot as plt
 import scipy.interpolate as sc
+from scipy.integrate import odeint
 import numpy as np
 from matplotlib.backends.backend_tkagg import FigureCanvasTkAgg  # Для встраивания графика в Tkinter
+from matplotlib.animation import FuncAnimation
+from PIL import Image, ImageTk
 
 from const import *
 from class_paint import Paint
@@ -11,20 +14,26 @@ from moment_inert import calc_moment_inert
 
 x = []
 y = []
+omega = 0
+omega_array = []
+time_array = []
 
 alpha = np.pi/4
 
 def btn_func():
-    global temperature_entry
-
     # Получаем значение температуры из текстового поля
     try:
-        global temperature
-        temperature = float(temperature_entry.get())
+        global lumin, albedo, a, ro, tau
+        lumin = float(lumin_entry.get())
+        albedo = float(albedo_entry.get())
+        a = float(a_entry.get())
+        ro = float(ro_entry.get())
+        tau = int(tau_entry.get())
     except ValueError:
         return
 
     # Проверка на наличие данных
+    global x, y
     if len(x) < 3 or len(y) < 3:
         return
 
@@ -40,23 +49,123 @@ def btn_func():
     x_arr = np.array(x)
     y_arr = np.array(y)
 
-    ax.plot(x_arr, y_arr, label="Original")
-
     # Аппроксимация нарисованного объекта
     step = 1000
     mytck, myu = sc.splprep([x_arr, y_arr])
+    global xnew, ynew
     xnew, ynew = sc.splev(np.linspace(0, 1, step), mytck)
-    ax.plot(xnew, ynew, 'red', label="Approximation")
 
-    global gamma
+    # Вычисляем центр масс
+    global Cx, Cy
+    Cx, Cy = calc_center_mass(x, y)
+    ax.scatter(0, 0, color='blue', zorder=5)
+
+    # Расчёт момента инерции
+    global moment_of_inertia
+    moment_of_inertia = round(calc_moment_inert(xnew, ynew))
+
+    xnew = np.array(xnew)
+    ynew = np.array(ynew)
+    xnew -= Cx
+    ynew -= Cy
+
+    ax.plot(xnew, ynew, 'black')
+    plt.title("Ваш астероид!")
+
+    # Встраиваем график в Tkinter
+    canvas = FigureCanvasTkAgg(fig, master=frame1)
+    canvas.draw()
+    canvas.get_tk_widget().pack(fill=BOTH, expand=True)
+
+    button.destroy()
+
+    global button_label
+    button_label = Label(master=frame3, text="Корректно ли всё отображается?", bg="gray", fg="white")
+    button_label.place(x=20, y=470)
+
+    global button_new
+    button_new = Button(master=frame3, text="Да!", command=anim_func)
+    button_new.place(x=20, y=500)
+    
+def anim_func():
+    button_label.destroy()
+    button_new.destroy()
+
+    fig, (ax1, ax2) = plt.subplots(1, 2, figsize=(12, 6))
+    root.geometry(f"1500x600+5+{h_window}")
+
+    edge = 2*max(xnew)
+    ax1.set_xlim(-edge, edge)
+    ax1.set_ylim(-edge, edge)
+    ax1.set_xlabel("Координаты по OX, м")
+    ax1.set_ylabel("Координаты по OY, м")
+    ax1.set_title("Движение астероида")
+
+    ax2.set_xlim(0, 5000)
+    ax2.set_ylim(0, 0.15*tau/10)
+    ax2.set_xlabel("Время, с")
+    ax2.set_ylabel("Угловая скорость, °/с")
+    ax2.set_title("Изменение ω")
+
+    global asteroid
+    asteroid, = ax1.plot([], [], '-', color='black')
+
+    global omega_anim, omega_anim_lines
+    omega_anim_lines, = ax2.plot([], [], '-', color='b')
+    omega_anim, = ax2.plot([], [], 'o', color='red')
+    
+    global ani
+    ani = FuncAnimation(fig, animate, frames=tau*100, interval=40)
+
+    plt.tight_layout()
+    ani.save("anim_asteroid.gif")
+
+    del ani
+    ani = None
+
+    show_gif()
+    return
+
+def show_gif():
+    for widget in frame1.winfo_children():
+        widget.destroy()
+
+    gif = Image.open("anim_asteroid.gif")
+    frames = []
+
+    try:
+        for i in range(gif.n_frames):
+            gif.seek(i)
+            frame = ImageTk.PhotoImage(gif.convert("RGBA"))
+            frames.append(frame)
+
+    except EOFError:
+        pass
+
+    label = Label(frame1)
+    label.pack()
+
+    def update(ind):
+        frame = frames[ind]
+        ind = (ind + 1) % len(frames)
+        label.configure(image=frame)
+        root.after(60, update, ind)
+
+    root.after(0, update, 0)
+
+def move_func(t):
+    global xnew, ynew, omega, omega_array, time_array
+    
     gamma = []
+    x_h_array = []
+    y_h_array = []
+    time = 10
 
     # Разделение на участки с заданной точностью
     acc = 20
+    step = 1000
     for i in range(0, step, acc):
         try:
-            ax.plot([xnew[i], xnew[i+acc]], [ynew[i], ynew[i+acc]], 'green')
-
             x_h = (xnew[i] + xnew[i+acc]) / 2
             y_h = (ynew[i] + ynew[i+acc]) / 2
 
@@ -78,12 +187,7 @@ def btn_func():
             x_end = x_h + scale * X_n
             y_end = y_h + scale * Y_n
 
-            # Рисуем нормаль
-            ax.plot([x_h, x_end], [y_h, y_end], 'black')
-
         except IndexError:
-            ax.plot([xnew[i], xnew[0]], [ynew[i], ynew[0]], 'green')
-
             x_h = (xnew[i] + xnew[0]) / 2
             y_h = (ynew[i] + ynew[0]) / 2
 
@@ -105,9 +209,6 @@ def btn_func():
             x_end = x_h + scale * X_n
             y_end = y_h + scale * Y_n
 
-            # Рисуем нормаль
-            ax.plot([x_h, x_end], [y_h, y_end], 'black')
-
         beta = np.arccos((x_end-x_h)/(np.sqrt((x_end-x_h)**2 + (y_end-y_h)**2)))
         if np.arcsin((y_end-y_h)/(np.sqrt((x_end-x_h)**2 + (y_end-y_h)**2)))<0:
             beta = - beta
@@ -116,52 +217,66 @@ def btn_func():
             if beta >= alpha:
                 if beta - alpha < np.pi/2:
                     gamma.append(float(beta - alpha))
-                    ax.plot([x_h, x_h+50*np.cos(alpha)], [y_h, y_h+50*np.sin(alpha)], 'yellow')
+                    x_h_array.append(x_h)
+                    y_h_array.append(y_h)
             else:
                 if alpha - beta < np.pi/2:
                     gamma.append(float(alpha - beta))
-                    ax.plot([x_h, x_h+50*np.cos(alpha)], [y_h, y_h+50*np.sin(alpha)], 'yellow')
+                    x_h_array.append(x_h)
+                    y_h_array.append(y_h)
         else:
             if abs(beta) >= np.pi - alpha:
                 if 2*np.pi - abs(beta) - alpha < np.pi/2:
                     gamma.append(float(2*np.pi - abs(beta) - alpha))
-                    ax.plot([x_h, x_h+50*np.cos(alpha)], [y_h, y_h+50*np.sin(alpha)], 'yellow')
+                    x_h_array.append(x_h)
+                    y_h_array.append(y_h)
             else:
                 if alpha + abs(beta) < np.pi/2:
                     gamma.append(float(alpha + abs(beta)))
-                    ax.plot([x_h, x_h+50*np.cos(alpha)], [y_h, y_h+50*np.sin(alpha)], 'yellow')
+                    x_h_array.append(x_h)
+                    y_h_array.append(y_h)
 
-    # Настройка легенды и заголовка
-    ax.set_title("Graph with Normals")
-
-    # Вычисляем центр масс
-    Cx, Cy = calc_center_mass(x, y)
-    ax.scatter(Cx, Cy, color='blue', zorder=5)
-    
-    # Расчёт момента инерции
-    moment_of_inertia = round(calc_moment_inert(xnew - Cx, ynew - Cy))
-    print(f"Момент инерции: {moment_of_inertia}")
-
-    # Встраиваем график в Tkinter
-    canvas = FigureCanvasTkAgg(fig, master=frame1)
-    canvas.draw()
-    canvas.get_tk_widget().pack(fill=BOTH, expand=True)
-    energy_calc()
-
-
-def energy_calc():
-    global temperature
-    lambda_max = b / temperature
-
-    mu = lambda_max
-    sigma = mu / 4
-
-    lambda_array = np.random.normal(mu, sigma, 1000)
-    impulse_array = []
+    dF = 2/3 * (1-albedo) * (lumin * lumin_son) / (4*np.pi*(a*ae)**2) * np.cos(gamma) * (np.pi*acc**2/4) / np.pi
+    M = 0
     for i in range(0, len(gamma)):
-        impulse_array.append(float(h / lambda_array[i] * np.cos(gamma[i])))
-    print(gamma)
-    print(impulse_array)
+        M += dF[i] * np.sqrt((x_h_array[i])**2+(y_h_array[i])**2)
+
+    epsilon = M / (ro * acc * moment_of_inertia)
+    omega += epsilon*time
+    omega = float(omega)
+    omega_array.append(float(omega*180/np.pi))
+
+    x_0 = np.array(xnew)
+    y_0 = np.array(ynew)
+    phi_0 = np.array(np.arccos(x_0/np.sqrt((x_0)**2+(y_0)**2)))
+    for i in range(0, len(phi_0)):
+        if np.array(np.arcsin(y_0/np.sqrt((x_0)**2+(y_0)**2)))[i]<0:
+            phi_0[i] = - phi_0[i]
+    r = np.array(np.sqrt((x_0)**2+(y_0)**2))
+
+    phi = np.array(phi_0 + omega*time)
+    x = np.array(r * np.cos(phi))
+    y = np.array(r * np.sin(phi))
+
+    time = time * len(omega_array)
+    time_array.append(time)
+
+    xnew, ynew = x,y
+
+    return xnew, ynew, time, float(omega*180/np.pi), time_array, omega_array
+
+def animate(i):
+    if ani == None:
+        raise ValueError()
+    print(i)
+    X, Y, Time, Omega, Time_array, Omega_array = move_func(t=i)
+
+    asteroid.set_data(X, Y)
+
+    omega_anim.set_data([Time], [Omega])
+    omega_anim_lines.set_data([Time_array],[Omega_array])
+
+    return asteroid, omega_anim, omega_anim_lines
 
 # Размеры окна
 w = 900
@@ -173,7 +288,7 @@ h_root = 600
 w_window = root.winfo_screenwidth() // 2 - w_root // 2
 h_window = root.winfo_screenheight() // 2 - h_root // 2
 root.geometry(f"1200x600+{w_window}+{h_window}")
-root.title("Рисуйте")
+root.title("YORP-эффект")
 root.resizable(width=False, height=False)
 
 frame0 = Frame(master=root, width=w, height=h, bg="black")
@@ -189,15 +304,39 @@ frame3 = Frame(master=root, width=200, bg="gray")
 frame3.pack(fill=BOTH, side=LEFT, expand=True)
 
 # Метка для текстового поля
-temperature_label = Label(master=frame3, text="Температура звезды (K):", bg="gray", fg="white")
-temperature_label.place(x=20, y=50)
+lumin_label = Label(master=frame3, text="Светимость звезды (в св. Солнца):", bg="gray", fg="white")
+lumin_label.place(x=20, y=50)
 
 # Текстовое поле для ввода температуры
-temperature_entry = Entry(master=frame3, width=15)
-temperature_entry.place(x=20, y=80)
+lumin_entry = Entry(master=frame3, width=15)
+lumin_entry.place(x=20, y=80)
+
+albedo_label = Label(master=frame3, text="Альбедо тела:", bg="gray", fg="white")
+albedo_label.place(x=20, y=110)
+
+albedo_entry = Entry(master=frame3, width=15)
+albedo_entry.place(x=20, y=140)
+
+a_label = Label(master=frame3, text="Большая полуось (а.е.):", bg="gray", fg="white")
+a_label.place(x=20, y=170)
+
+a_entry = Entry(master=frame3, width=15)
+a_entry.place(x=20, y=200)
+
+ro_label = Label(master=frame3, text="Плотность тела (кг/м:3):", bg="gray", fg="white")
+ro_label.place(x=20, y=230)
+
+ro_entry = Entry(master=frame3, width=15)
+ro_entry.place(x=20, y=260)
+
+tau_label = Label(master=frame3, text="Время моделирования (10^3 с):", bg="gray", fg="white")
+tau_label.place(x=20, y=290)
+
+tau_entry = Entry(master=frame3, width=15)
+tau_entry.place(x=20, y=320)
 
 button = Button(master=frame3, text="Сохранить!", command=btn_func)
-button.place(x=98, y=500)
+button.place(x=20, y=500)
 
 app = Paint(frame1, x, y)  # Передаем размеры окна
 root.mainloop()
