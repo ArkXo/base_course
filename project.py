@@ -20,6 +20,30 @@ time_array = []
 
 alpha = np.pi/4
 
+def ray_segment_intersection(ray_origin, ray_dir, segment_p1, segment_p2):
+    """
+    ray_origin — начальная точка луча (x, y)
+    ray_dir — направление луча (dx, dy)
+    segment_p1, segment_p2 — концы отрезка
+    Возвращает True, если луч пересекает отрезок
+    """
+    # Работаем с numpy
+    p0 = np.array(ray_origin)
+    d = np.array(ray_dir)
+    p1 = np.array(segment_p1)
+    p2 = np.array(segment_p2)
+
+    e1 = p1 - p0
+    e2 = p2 - p1
+    cross_d_e2 = d[0] * e2[1] - d[1] * e2[0]
+    if abs(cross_d_e2) < 1e-10:
+        return False  # Коллинеарны или параллельны
+
+    t = (e1[0] * e2[1] - e1[1] * e2[0]) / cross_d_e2
+    u = (e1[0] * d[1] - e1[1] * d[0]) / cross_d_e2
+
+    return t >= 0 and 0 <= u <= 1
+
 def btn_func():
     # Получаем значение температуры из текстового поля
     try:
@@ -57,18 +81,19 @@ def btn_func():
 
     # Вычисляем центр масс
     global Cx, Cy
-    Cx, Cy = calc_center_mass(x, y)
+    Cx, Cy = calc_center_mass(xnew, ynew)
     ax.scatter(0, 0, color='blue', zorder=5)
-
-    # Расчёт момента инерции
-    global moment_of_inertia
-    moment_of_inertia = round(calc_moment_inert(xnew, ynew))
 
     xnew = np.array(xnew)
     ynew = np.array(ynew)
     xnew -= Cx
     ynew -= Cy
 
+    # Расчёт момента инерции
+    global moment_of_inertia
+    moment_of_inertia = round(calc_moment_inert(xnew, ynew))
+
+    
     ax.plot(xnew, ynew, 'black')
     plt.title("Ваш астероид!")
 
@@ -101,10 +126,10 @@ def anim_func():
     ax1.set_ylabel("Координаты по OY, м")
     ax1.set_title("Движение астероида")
 
-    ax2.set_xlim(0, 5000)
-    ax2.set_ylim(0, 0.15*tau/10)
-    ax2.set_xlabel("Время, с")
-    ax2.set_ylabel("Угловая скорость, °/с")
+    ax2.set_xlim(0, 200)
+    ax2.set_ylim(-0.5, 0.5)
+    ax2.set_xlabel("Время, года")
+    ax2.set_ylabel("Угловая скорость, °/час")
     ax2.set_title("Изменение ω")
 
     global asteroid
@@ -115,7 +140,7 @@ def anim_func():
     omega_anim, = ax2.plot([], [], 'o', color='red')
     
     global ani
-    ani = FuncAnimation(fig, animate, frames=tau*100, interval=40)
+    ani = FuncAnimation(fig, animate, frames=500, interval=60)
 
     plt.tight_layout()
     ani.save("anim_asteroid.gif")
@@ -157,9 +182,11 @@ def move_func(t):
     global xnew, ynew, omega, omega_array, time_array
     
     gamma = []
+    beta_aray = []
     x_h_array = []
     y_h_array = []
-    time = 10
+    S_array = []
+    time = 10**7
 
     # Разделение на участки с заданной точностью
     acc = 20
@@ -209,42 +236,67 @@ def move_func(t):
             x_end = x_h + scale * X_n
             y_end = y_h + scale * Y_n
 
-        beta = np.arccos((x_end-x_h)/(np.sqrt((x_end-x_h)**2 + (y_end-y_h)**2)))
-        if np.arcsin((y_end-y_h)/(np.sqrt((x_end-x_h)**2 + (y_end-y_h)**2)))<0:
-            beta = - beta
+        sun_dir = np.array([np.cos(alpha), np.sin(alpha)])
 
-        if beta >= 0:
-            if beta >= alpha:
-                if beta - alpha < np.pi/2:
-                    gamma.append(float(beta - alpha))
-                    x_h_array.append(x_h)
-                    y_h_array.append(y_h)
-            else:
-                if alpha - beta < np.pi/2:
-                    gamma.append(float(alpha - beta))
-                    x_h_array.append(x_h)
-                    y_h_array.append(y_h)
-        else:
-            if abs(beta) >= np.pi - alpha:
-                if 2*np.pi - abs(beta) - alpha < np.pi/2:
-                    gamma.append(float(2*np.pi - abs(beta) - alpha))
-                    x_h_array.append(x_h)
-                    y_h_array.append(y_h)
-            else:
-                if alpha + abs(beta) < np.pi/2:
-                    gamma.append(float(alpha + abs(beta)))
-                    x_h_array.append(x_h)
-                    y_h_array.append(y_h)
+        is_in_shadow = False
+        for j in range(0, step, acc):
 
-    dF = 2/3 * (1-albedo) * (lumin * lumin_son) / (4*np.pi*(a*ae)**2) * np.cos(gamma) * (np.pi*acc**2/4) / np.pi
+            p1 = [xnew[j], ynew[j]]
+            p2 = [xnew[(j + acc) % step], ynew[(j + acc) % step]]
+
+            if ray_segment_intersection((x_h, y_h), sun_dir, p1, p2):
+                is_in_shadow = True
+                break
+
+        if is_in_shadow == False: # Участок не в тени
+        
+            beta = np.arccos((x_end-x_h)/(np.sqrt((x_end-x_h)**2 + (y_end-y_h)**2)))
+            if np.arcsin((y_end-y_h)/(np.sqrt((x_end-x_h)**2 + (y_end-y_h)**2)))<0:
+                beta = - beta
+
+            if beta >= 0:
+                if beta >= alpha:
+                    if beta - alpha < np.pi/2:
+                        gamma.append(float(beta - alpha))
+                        beta_aray.append(beta)
+                        x_h_array.append(x_h)
+                        y_h_array.append(y_h)
+                        S_array.append(abs(y_n))
+                else:
+                    if alpha - beta < np.pi/2:
+                        gamma.append(float(alpha - beta))
+                        beta_aray.append(beta)
+                        x_h_array.append(x_h)
+                        y_h_array.append(y_h)
+                        S_array.append(abs(y_n))
+            else:
+                if abs(beta) >= np.pi - alpha:
+                    if 2*np.pi - abs(beta) - alpha < np.pi/2:
+                        gamma.append(float(2*np.pi - abs(beta) - alpha))
+                        beta_aray.append(beta)
+                        x_h_array.append(x_h)   
+                        y_h_array.append(y_h)
+                        S_array.append(abs(y_n))
+                else:
+                    if alpha + abs(beta) < np.pi/2:
+                        gamma.append(float(alpha + abs(beta)))
+                        beta_aray.append(beta)
+                        x_h_array.append(x_h)
+                        y_h_array.append(y_h)
+                        S_array.append(abs(y_n))
+
+    dF = 2/3 * (1-albedo) * (lumin * lumin_son) / (4*np.pi*(a*ae)**2) * np.cos(gamma) / np.pi  / c
     M = 0
     for i in range(0, len(gamma)):
-        M += dF[i] * np.sqrt((x_h_array[i])**2+(y_h_array[i])**2)
+        if beta_aray[i] >= alpha:
+            M += dF[i] * S_array[i] * np.sqrt((x_h_array[i])**2+(y_h_array[i])**2) 
+        else:
+            M -= dF[i] * S_array[i] * np.sqrt((x_h_array[i])**2+(y_h_array[i])**2)
 
-    epsilon = M / (ro * acc * moment_of_inertia)
+    epsilon = M / (ro * moment_of_inertia)
     omega += epsilon*time
     omega = float(omega)
-    omega_array.append(float(omega*180/np.pi))
+    omega_array.append(float(omega*180/np.pi*60*60))
 
     x_0 = np.array(xnew)
     y_0 = np.array(ynew)
@@ -259,11 +311,11 @@ def move_func(t):
     y = np.array(r * np.sin(phi))
 
     time = time * len(omega_array)
-    time_array.append(time)
+    time_array.append(time/60/60/24/365)
 
     xnew, ynew = x,y
 
-    return xnew, ynew, time, float(omega*180/np.pi), time_array, omega_array
+    return xnew, ynew, float(time/60/60/24/365), float(omega*180/np.pi*60*60), time_array, omega_array
 
 def animate(i):
     if ani == None:
@@ -329,7 +381,7 @@ ro_label.place(x=20, y=230)
 ro_entry = Entry(master=frame3, width=15)
 ro_entry.place(x=20, y=260)
 
-tau_label = Label(master=frame3, text="Время моделирования (10^3 с):", bg="gray", fg="white")
+tau_label = Label(master=frame3, text="Время моделирования (десятки тысяч лет):", bg="gray", fg="white")
 tau_label.place(x=20, y=290)
 
 tau_entry = Entry(master=frame3, width=15)
